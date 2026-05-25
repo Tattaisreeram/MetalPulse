@@ -35,16 +35,23 @@ cd MetalPulse
 
 ### 2. Configure the backend
 
-The backend uses `application.properties` with sensible defaults. Update the environment variables if needed:
+Copy the example file and fill in your local values:
 
 ```bash
-export DATABASE_URL="jdbc:mysql://127.0.0.1:3306/metalpulse_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true"
-export DATABASE_USERNAME="root"
-export DATABASE_PASSWORD="test"
-export JWT_SECRET="replace-with-a-strong-32-plus-character-secret"
+cp .env.example .env
 ```
 
-You can also edit `service/src/main/resources/application.properties` directly if you prefer a local setup.
+Then edit `.env` and replace the placeholder values with your local MySQL credentials and a strong JWT secret.
+
+```env
+DATABASE_URL=jdbc:mysql://127.0.0.1:3306/metalpulse_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+DATABASE_USERNAME=your_mysql_username
+DATABASE_PASSWORD=your_mysql_password
+JWT_SECRET=replace-with-a-long-random-secret
+JWT_EXPIRATION_MS=86400000
+```
+
+The backend loads this file automatically through Spring Boot. Keep your real `.env` file local and do not commit it.
 
 ### 3. Start the backend
 
