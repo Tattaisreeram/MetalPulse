@@ -20,6 +20,11 @@ public class UserDAOImpl implements UserDAO {
     }
 
     @Override
+    public User getReferenceById(Long id) {
+        return userRepository.getReferenceById(id);
+    }
+
+    @Override
     public Optional<User> findById(Long id) {
         return userRepository.findById(id);
     }

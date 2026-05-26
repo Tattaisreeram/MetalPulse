@@ -1,7 +1,6 @@
 package com.smarthmalik.metalpulse.core.security;
 
 import com.smarthmalik.metalpulse.core.constant.ApplicationProperties;
-import com.smarthmalik.metalpulse.core.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -20,10 +19,10 @@ public class JwtTokenProvider {
 
     private final ApplicationProperties appProperties;
 
-    public String generateToken(User user) {
+    public String generateToken(String username) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .subject(user.getUsername())
+                .subject(username)
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + appProperties.getJwt().getExpirationMs()))
                 .signWith(signingKey())

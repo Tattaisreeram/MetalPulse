@@ -177,4 +177,19 @@ public class TradeServiceImpl implements TradeService {
         Page<Trade> tradePage = tradeDAO.findByUserId(user.getId(), PageRequest.of(page, size));
         return tradePage.getContent().stream().map(mapper::toTradeDto).toList();
     }
+
+    @Override
+    // Called by AuthFacade in the same transaction that just created the user, so getReferenceById should
+    // never resolve to a missing row. If it does, it indicates transaction propagation failure or external
+    // DB modification mid-transaction.
+    public void createBonusTrade(Long userId, BigDecimal amount) {
+        User userRef = userDAO.getReferenceById(userId);
+        tradeDAO.save(Trade.builder()
+                .user(userRef)
+                .tradeType(Trade.TradeType.BONUS)
+                .currency("USD")
+                .totalAmount(amount)
+                .status(Trade.TradeStatus.COMPLETED)
+                .build());
+    }
 }
