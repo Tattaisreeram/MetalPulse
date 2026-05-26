@@ -73,13 +73,7 @@ public class EntityDTOMapper {
     }
 
     public AuthResponse toAuthResponse(User user, String token) {
-        return AuthResponse.of(
-                token,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole().name()
-        );
+        return new AuthResponse(token, "Bearer", user.getId(), user.getUsername(), user.getEmail(), user.getRole().name());
     }
 
     public PriceAnalyticsDto toPriceAnalyticsDto(
