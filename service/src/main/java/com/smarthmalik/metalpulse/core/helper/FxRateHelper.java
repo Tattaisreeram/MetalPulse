@@ -1,17 +1,19 @@
 package com.smarthmalik.metalpulse.core.helper;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.smarthmalik.metalpulse.SupportedCurrency;
-import com.smarthmalik.metalpulse.exception.UnsupportedCurrencyException;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.smarthmalik.metalpulse.SupportedCurrency;
+import com.smarthmalik.metalpulse.exception.UnsupportedCurrencyException;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component

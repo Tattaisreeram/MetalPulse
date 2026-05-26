@@ -1,2 +1,2 @@
 rootProject.name = 'MetalPulse'
-include 'api', 'service'
+include 'api', 'proto', 'service'
