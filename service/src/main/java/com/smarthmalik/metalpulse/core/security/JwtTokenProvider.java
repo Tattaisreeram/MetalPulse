@@ -19,10 +19,10 @@ public class JwtTokenProvider {
 
     private final ApplicationProperties appProperties;
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(String username) {
         long now = System.currentTimeMillis();
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(username)
                 .issuedAt(new Date(now))
                 .expiration(new Date(now + appProperties.getJwt().getExpirationMs()))
                 .signWith(signingKey())

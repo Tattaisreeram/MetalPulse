@@ -8,6 +8,8 @@ public interface UserDAO {
 
     User save(User user);
 
+    User getReferenceById(Long id);
+
     Optional<User> findById(Long id);
 
     Optional<User> findByUsername(String username);
