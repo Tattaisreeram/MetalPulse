@@ -1,12 +1,15 @@
 package com.smarthmalik.metalpulse.core.helper;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.smarthmalik.metalpulse.SupportedCurrency;
+import com.smarthmalik.metalpulse.exception.UnsupportedCurrencyException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -22,13 +25,31 @@ public class FxRateHelper {
     private volatile long cacheTimestamp = 0L;
 
     public BigDecimal toUsd(BigDecimal amount, String currency) {
-        if (currency == null || "USD".equalsIgnoreCase(currency)) return amount;
-        BigDecimal rate = getRates().get(currency.toUpperCase());
-        if (rate == null || rate.compareTo(BigDecimal.ZERO) == 0) {
-            log.warn("No FX rate for currency={}, using raw amount", currency);
+        SupportedCurrency supportedCurrency = normalizeCurrency(currency);
+
+        if (supportedCurrency == SupportedCurrency.USD) {
             return amount;
         }
+
+        BigDecimal rate = getRates().get(supportedCurrency.name());
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new UnsupportedCurrencyException(supportedCurrency.name(), "rate unavailable");
+        }
+
         return amount.divide(rate, 6, RoundingMode.HALF_UP);
+    }
+
+    private SupportedCurrency normalizeCurrency(String currency) {
+        if (currency == null || currency.isBlank()) {
+            throw new UnsupportedCurrencyException("blank", "missing currency");
+        }
+
+        String normalized = currency.trim().toUpperCase(Locale.ROOT);
+        try {
+            return SupportedCurrency.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            throw new UnsupportedCurrencyException(normalized);
+        }
     }
 
     private Map<String, BigDecimal> getRates() {
