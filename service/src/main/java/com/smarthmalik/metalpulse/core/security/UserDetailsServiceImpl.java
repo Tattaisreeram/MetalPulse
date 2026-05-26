@@ -1,6 +1,7 @@
 package com.smarthmalik.metalpulse.core.security;
 
 import com.smarthmalik.metalpulse.core.dao.UserDAO;
+import com.smarthmalik.metalpulse.core.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +16,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userDAO.findByUsername(username)
+        User user = userDAO.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        return new UserPrincipal(user);
     }
 }
