@@ -4,6 +4,7 @@ import com.smarthmalik.metalpulse.dto.response.ApiResponse;
 import com.smarthmalik.metalpulse.exception.ExternalApiException;
 import com.smarthmalik.metalpulse.exception.InsufficientBalanceException;
 import com.smarthmalik.metalpulse.exception.ResourceNotFoundException;
+import com.smarthmalik.metalpulse.exception.UnsupportedCurrencyException;
 import io.jsonwebtoken.JwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InsufficientBalanceException.class)
     public ResponseEntity<ApiResponse<Void>> handleInsufficientBalance(InsufficientBalanceException ex) {
         return ResponseEntity.badRequest()
+                .body(ApiResponse.error(ex.getMessage()));
+    }
+
+    @ExceptionHandler(UnsupportedCurrencyException.class)
+    public ResponseEntity<ApiResponse<Void>> handleUnsupportedCurrency(UnsupportedCurrencyException ex) {
+        return ResponseEntity.unprocessableEntity()
                 .body(ApiResponse.error(ex.getMessage()));
     }
 
