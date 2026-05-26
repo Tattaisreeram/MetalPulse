@@ -1,12 +1,9 @@
 package com.smarthmalik.metalpulse.core.service;
 
-import com.smarthmalik.metalpulse.dto.request.LoginRequest;
 import com.smarthmalik.metalpulse.dto.request.RegisterRequest;
-import com.smarthmalik.metalpulse.dto.response.AuthResponse;
+import com.smarthmalik.metalpulse.dto.response.UserDto;
 
 public interface AuthService {
 
-    AuthResponse register(RegisterRequest request);
-
-    AuthResponse login(LoginRequest request);
+    UserDto register(RegisterRequest request);
 }
