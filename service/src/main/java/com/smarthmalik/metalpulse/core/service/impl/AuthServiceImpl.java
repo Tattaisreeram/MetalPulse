@@ -9,6 +9,7 @@ import com.smarthmalik.metalpulse.core.entity.Trade;
 import com.smarthmalik.metalpulse.core.entity.User;
 import com.smarthmalik.metalpulse.core.mapper.EntityDTOMapper;
 import com.smarthmalik.metalpulse.core.security.JwtTokenProvider;
+import com.smarthmalik.metalpulse.core.security.UserPrincipal;
 import com.smarthmalik.metalpulse.core.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +73,13 @@ public class AuthServiceImpl implements AuthService {
                 new UsernamePasswordAuthenticationToken(request.username(), request.password())
         );
 
-        User user = (User) authentication.getPrincipal();
+        Object raw = authentication.getPrincipal();
+        if (!(raw instanceof UserPrincipal principal)) {
+            throw new IllegalStateException(
+                "Expected UserPrincipal but got: " + (raw == null ? "null" : raw.getClass().getName())
+            );
+        }
+        User user = principal.getUser();
         String token = jwtTokenProvider.generateToken(user);
 
         log.info("User logged in: username={}", user.getUsername());
