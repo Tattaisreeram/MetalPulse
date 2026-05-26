@@ -1,0 +1,62 @@
+syntax = "proto3";
+
+package metalpulse.v1;
+
+option java_multiple_files = true;
+option java_package = "com.smarthmalik.metalpulse.grpc.v1";
+
+import "metalpulse/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+service TradeService {
+  rpc Buy(TradeRequest)             returns (TradeResponse);
+  rpc Sell(TradeRequest)            returns (TradeResponse);
+  rpc Hold(TradeRequest)            returns (TradeResponse);
+  rpc Deposit(BalanceRequest)       returns (BalanceResponse);
+  rpc Withdraw(BalanceRequest)      returns (BalanceResponse);
+  rpc GetBalance(GetBalanceRequest) returns (BalanceResponse);
+  rpc GetTradeHistory(HistoryRequest) returns (HistoryResponse);
+}
+
+message TradeRequest {
+  string metal      = 1;
+  string currency   = 2;
+  string weight_unit = 3;
+  double quantity   = 4;
+}
+
+message BalanceRequest {
+  double amount   = 1;
+  string currency = 2;
+}
+
+message GetBalanceRequest {}
+
+message TradeResponse {
+  int64  id            = 1;
+  string trade_type    = 2;
+  string metal         = 3;
+  string metal_name    = 4;
+  string currency      = 5;
+  string weight_unit   = 6;
+  double quantity      = 7;
+  double price_per_unit = 8;
+  double total_amount  = 9;
+  string status        = 10;
+  google.protobuf.Timestamp created_at = 11;
+}
+
+message BalanceResponse {
+  int64  user_id  = 1;
+  string username = 2;
+  double balance  = 3;
+}
+
+message HistoryRequest {
+  int32 page = 1;
+  int32 size = 2;
+}
+
+message HistoryResponse {
+  repeated TradeResponse trades = 1;
+}
