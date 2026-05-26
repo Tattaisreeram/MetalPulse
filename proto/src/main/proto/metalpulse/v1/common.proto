@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package metalpulse.v1;
+
+option java_multiple_files = true;
+option java_package = "com.smarthmalik.metalpulse.grpc.v1";
+
+import "google/protobuf/timestamp.proto";
+
+message Money {
+  int64 units = 1;
+  int32 nanos = 2;
+}
+
+enum Metal {
+  METAL_UNSPECIFIED = 0;
+  XAU = 1;
+  XAG = 2;
+  XPT = 3;
+  XPD = 4;
+}
+
+enum WeightUnit {
+  WEIGHT_UNIT_UNSPECIFIED = 0;
+  GRAM = 1;
+  OUNCE = 2;
+  KILOGRAM = 3;
+  TOLA = 4;
+}
+
+enum TradeType {
+  TRADE_TYPE_UNSPECIFIED = 0;
+  BUY = 1;
+  SELL = 2;
+  HOLD = 3;
+  DEPOSIT = 4;
+  WITHDRAW = 5;
+  BONUS = 6;
+}
+
+enum TradeStatus {
+  TRADE_STATUS_UNSPECIFIED = 0;
+  PENDING = 1;
+  COMPLETED = 2;
+  FAILED = 3;
+}
+
+message TimeRange {
+  google.protobuf.Timestamp from = 1;
+  google.protobuf.Timestamp to = 2;
+}
