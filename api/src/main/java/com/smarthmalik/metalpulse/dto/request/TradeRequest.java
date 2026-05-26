@@ -1,12 +1,14 @@
 package com.smarthmalik.metalpulse.dto.request;
 
+import java.math.BigDecimal;
+
+import com.smarthmalik.metalpulse.SupportedCurrency;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-
-import java.math.BigDecimal;
 
 @Schema(description = "Request to buy, sell, or hold a precious metal")
 public record TradeRequest(
@@ -17,6 +19,7 @@ public record TradeRequest(
         String metal,
 
         @NotBlank(message = "Currency code is required")
+        @Pattern(regexp = SupportedCurrency.REGEX, message = SupportedCurrency.VALIDATION_MESSAGE)
         @Schema(example = "PKR")
         String currency,
 

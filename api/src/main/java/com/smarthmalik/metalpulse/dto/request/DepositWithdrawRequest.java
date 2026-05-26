@@ -1,11 +1,14 @@
 package com.smarthmalik.metalpulse.dto.request;
 
+import java.math.BigDecimal;
+
+import com.smarthmalik.metalpulse.SupportedCurrency;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
-import java.math.BigDecimal;
+import jakarta.validation.constraints.Pattern;
 
 @Schema(description = "Deposit or withdrawal amount with currency")
 public record DepositWithdrawRequest(
@@ -16,6 +19,7 @@ public record DepositWithdrawRequest(
         BigDecimal amount,
 
         @NotBlank(message = "Currency is required")
-        @Schema(example = "USD", allowableValues = {"PKR", "USD", "EUR", "GBP"})
+        @Pattern(regexp = SupportedCurrency.REGEX, message = SupportedCurrency.VALIDATION_MESSAGE)
+        @Schema(example = "USD")
         String currency
 ) {}
