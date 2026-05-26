@@ -6,6 +6,7 @@ import com.smarthmalik.metalpulse.dto.response.BalanceDto;
 import com.smarthmalik.metalpulse.dto.response.TradeDto;
 import com.smarthmalik.metalpulse.core.entity.User;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface TradeService {
@@ -23,4 +24,6 @@ public interface TradeService {
     BalanceDto getBalance(User user);
 
     List<TradeDto> getTradeHistory(User user, int page, int size);
+
+    void createBonusTrade(Long userId, BigDecimal amount);
 }

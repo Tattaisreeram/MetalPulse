@@ -2,6 +2,7 @@ package com.smarthmalik.metalpulse.core.mapper;
 
 import com.smarthmalik.metalpulse.dto.response.*;
 import com.smarthmalik.metalpulse.core.entity.Trade;
+import com.smarthmalik.metalpulse.dto.response.UserDto;
 import com.smarthmalik.metalpulse.core.entity.User;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerHistoricalEntry;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerSpotPriceResponse;
@@ -72,14 +73,14 @@ public class EntityDTOMapper {
         return new BalanceDto(user.getId(), user.getUsername(), user.getBalance());
     }
 
-    public AuthResponse toAuthResponse(User user, String token) {
-        return AuthResponse.of(
-                token,
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                user.getRole().name()
-        );
+    public UserDto toUserDto(User user) {
+        return new UserDto(user.getId(), user.getUsername(), user.getEmail(),
+                user.getRole().name(), user.getBalance());
+    }
+
+    public AuthResponse toAuthResponse(UserDto userDto, String token) {
+        return new AuthResponse(token, "Bearer", userDto.userId(), userDto.username(),
+                userDto.email(), userDto.role());
     }
 
     public PriceAnalyticsDto toPriceAnalyticsDto(
