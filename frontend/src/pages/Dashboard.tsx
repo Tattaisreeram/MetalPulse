@@ -43,7 +43,15 @@ function MetalCard({ metal, currency, weightUnit }: { metal: typeof METALS[0]; c
   const stable   = Math.abs(trueChangePercent) < 0.01;
 
   return (
-    <div className="glass rounded-2xl p-5 flex flex-col gap-4 hover:border-white/15 transition-all duration-300">
+    <div className="relative glass rounded-2xl overflow-hidden flex flex-col gap-4 hover:border-white/15 transition-all duration-300">
+      {/* Card background image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center opacity-20"
+        style={{ backgroundImage: `url(${metal.cardImage})` }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#080810]/60 via-[#080810]/70 to-[#080810]/90" />
+
+      <div className="relative z-10 p-5 flex flex-col gap-4">
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div
@@ -103,6 +111,7 @@ function MetalCard({ metal, currency, weightUnit }: { metal: typeof METALS[0]; c
         <span>Bid: <span className="text-slate-300">{spot ? fmt(spot.bid, currency) : '–'}</span></span>
         <span>Ask: <span className="text-slate-300">{spot ? fmt(spot.ask, currency) : '–'}</span></span>
       </div>
+      </div> {/* z-10 content wrapper */}
     </div>
   );
 }
@@ -175,7 +184,10 @@ export default function Dashboard() {
       </div>
 
       {/* Balance card */}
-      <div className="glass rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-amber-500/10 gold-glow">
+      <div className="relative glass rounded-2xl overflow-hidden flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-amber-500/10 gold-glow">
+        <div className="absolute inset-0 bg-cover bg-center opacity-15" style={{ backgroundImage: 'url(/dashboard-hero.jpg)' }} />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#080810]/90 via-[#080810]/75 to-[#080810]/60" />
+        <div className="relative z-10 w-full flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-6">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center">
             <Wallet size={22} className="text-amber-400" />
@@ -205,6 +217,7 @@ export default function Dashboard() {
             Trade Now
           </a>
         </div>
+        </div> {/* z-10 content wrapper */}
       </div>
 
       {/* Metal cards */}

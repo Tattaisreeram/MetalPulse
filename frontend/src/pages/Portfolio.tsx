@@ -175,10 +175,14 @@ export default function Portfolio() {
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-14 w-full rounded-xl" />)}
           </div>
         ) : !trades?.length ? (
-          <div className="py-16 text-center text-slate-500">
-            <Clock size={32} className="mx-auto mb-3 opacity-30" />
-            <p>No trades yet</p>
-            <p className="text-sm mt-1">Go to Trade to make your first trade</p>
+          <div className="py-12 flex flex-col items-center gap-4 text-slate-500">
+            <img
+              src="/portfolio-empty.jpg"
+              alt="No trades yet"
+              className="w-40 h-40 object-cover rounded-2xl opacity-60"
+            />
+            <p className="font-medium text-slate-400">No trades yet</p>
+            <p className="text-sm">Go to Trade to make your first trade</p>
           </div>
         ) : (
           <div className="divide-y divide-white/5">

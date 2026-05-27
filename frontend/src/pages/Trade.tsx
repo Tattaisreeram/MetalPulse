@@ -94,9 +94,14 @@ export default function Trade() {
 
   return (
     <div className="space-y-6 animate-fade-up max-w-2xl mx-auto">
-      <div>
-        <h1 className="text-2xl font-bold text-white">Trade</h1>
-        <p className="text-slate-400 text-sm mt-1">Buy, sell, or hold precious metals at live prices</p>
+      {/* Trade hero */}
+      <div className="relative rounded-2xl overflow-hidden h-28">
+        <img src="/trade-hero.jpg" alt="" aria-hidden="true" className="absolute inset-0 w-full h-full object-cover object-center" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#080810]/90 via-[#080810]/70 to-transparent" />
+        <div className="relative z-10 flex flex-col justify-center h-full px-6">
+          <h1 className="text-2xl font-bold text-white">Trade</h1>
+          <p className="text-slate-400 text-sm mt-0.5">Buy, sell, or hold precious metals at live prices</p>
+        </div>
       </div>
 
       {/* Trade type tabs */}
@@ -196,6 +201,7 @@ export default function Trade() {
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">Currency</label>
             <select
+              title="Currency"
               value={currency}
               onChange={(e) => setCurrency(e.target.value)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500/60"
@@ -206,6 +212,7 @@ export default function Trade() {
           <div>
             <label className="block text-xs font-medium text-slate-400 mb-1.5 uppercase tracking-wider">Unit</label>
             <select
+              title="Weight unit"
               value={weightUnit}
               onChange={(e) => setWeightUnit(e.target.value as WeightUnit)}
               className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-amber-500/60"

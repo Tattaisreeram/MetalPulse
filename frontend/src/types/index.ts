@@ -95,11 +95,11 @@ export interface ReturnsDto {
 export type Metal = 'XAU' | 'XAG' | 'XPT' | 'XPD';
 export type WeightUnit = 'g' | 'oz' | 'kg' | 'tola';
 
-export const METALS: { symbol: Metal; name: string; color: string; icon: string }[] = [
-  { symbol: 'XAU', name: 'Gold',      color: '#f59e0b', icon: '🥇' },
-  { symbol: 'XAG', name: 'Silver',    color: '#94a3b8', icon: '🥈' },
-  { symbol: 'XPT', name: 'Platinum',  color: '#7dd3fc', icon: '💎' },
-  { symbol: 'XPD', name: 'Palladium', color: '#a78bfa', icon: '✨' },
+export const METALS: { symbol: Metal; name: string; color: string; icon: string; cardImage: string }[] = [
+  { symbol: 'XAU', name: 'Gold',      color: '#f59e0b', icon: '🥇', cardImage: '/gold-card.jpg'      },
+  { symbol: 'XAG', name: 'Silver',    color: '#94a3b8', icon: '🥈', cardImage: '/silver-card.jpg'    },
+  { symbol: 'XPT', name: 'Platinum',  color: '#7dd3fc', icon: '💎', cardImage: '/platinum-card.jpg'  },
+  { symbol: 'XPD', name: 'Palladium', color: '#a78bfa', icon: '✨', cardImage: '/palladium-card.jpg' },
 ];
 
 export const WEIGHT_UNITS: { value: WeightUnit; label: string }[] = [
