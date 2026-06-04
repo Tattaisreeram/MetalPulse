@@ -6,6 +6,7 @@ import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerHistoricalEntry;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerHistoricalResponse;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerSpotPriceResponse;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -30,6 +31,7 @@ public class MetalPriceHelper {
         this.goldbrokerRestClient = goldbrokerRestClient;
     }
 
+    @Retry(name = "goldbrokerApi")
     @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchSpotPriceFallback")
     public GoldbrokerSpotPriceResponse fetchSpotPrice(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
@@ -51,6 +53,7 @@ public class MetalPriceHelper {
         }
     }
 
+    @Retry(name = "goldbrokerApi")
     @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchHistoricalPricesFallback")
     public GoldbrokerHistoricalResponse fetchHistoricalPrices(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
@@ -72,6 +75,7 @@ public class MetalPriceHelper {
         }
     }
 
+    @Retry(name = "goldbrokerApi")
     @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchFullHistoryFallback")
     public GoldbrokerHistoricalResponse fetchFullHistory(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
