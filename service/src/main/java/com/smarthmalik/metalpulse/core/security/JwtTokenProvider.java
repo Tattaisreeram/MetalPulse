@@ -37,6 +37,11 @@ public class JwtTokenProvider {
         return extractUsername(token).equals(userDetails.getUsername()) && !isExpired(token);
     }
 
+    public long getRemainingValidityMs(String token) {
+        Date expiration = extractClaim(token, Claims::getExpiration);
+        return Math.max(0, expiration.getTime() - System.currentTimeMillis());
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> resolver) {
         Claims claims = Jwts.parser()
                 .verifyWith(signingKey())

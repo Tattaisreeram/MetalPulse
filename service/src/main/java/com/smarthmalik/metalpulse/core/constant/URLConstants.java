@@ -10,6 +10,7 @@ public final class URLConstants {
     public static final String AUTH_BASE     = API_V1 + "/auth";
     public static final String AUTH_REGISTER = AUTH_BASE + "/register";
     public static final String AUTH_LOGIN    = AUTH_BASE + "/login";
+    public static final String AUTH_LOGOUT   = AUTH_BASE + "/logout";
 
     // Metal prices
     public static final String METAL_BASE         = API_V1 + "/metals";

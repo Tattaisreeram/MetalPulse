@@ -7,6 +7,7 @@ import com.smarthmalik.metalpulse.dto.response.AuthResponse;
 import com.smarthmalik.metalpulse.dto.response.UserDto;
 import com.smarthmalik.metalpulse.core.mapper.EntityDTOMapper;
 import com.smarthmalik.metalpulse.core.security.JwtTokenProvider;
+import com.smarthmalik.metalpulse.core.security.TokenBlacklistService;
 import com.smarthmalik.metalpulse.core.security.UserPrincipal;
 import com.smarthmalik.metalpulse.core.service.AuthService;
 import com.smarthmalik.metalpulse.core.service.TradeService;
@@ -26,6 +27,7 @@ public class AuthFacade {
     private final AuthService authService;
     private final TradeService tradeService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TokenBlacklistService tokenBlacklistService;
     private final AuthenticationManager authenticationManager;
     private final EntityDTOMapper mapper;
 
@@ -55,5 +57,12 @@ public class AuthFacade {
         AuthResponse authResponse = mapper.toAuthResponse(userDto, token);
         log.info("User logged in: username={}", principal.getUsername());
         return ApiResponse.success("Login successful", authResponse);
+    }
+
+    public ApiResponse<Void> logout(String token) {
+        long remainingMs = jwtTokenProvider.getRemainingValidityMs(token);
+        tokenBlacklistService.blacklist(token, remainingMs);
+        log.info("Token blacklisted for remaining {}ms", remainingMs);
+        return ApiResponse.success("Logout successful", null);
     }
 }

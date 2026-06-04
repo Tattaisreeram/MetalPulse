@@ -5,6 +5,7 @@ import com.smarthmalik.metalpulse.core.constant.ResourceConstants;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerHistoricalEntry;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerHistoricalResponse;
 import com.smarthmalik.metalpulse.core.helper.api.GoldbrokerSpotPriceResponse;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -29,6 +30,7 @@ public class MetalPriceHelper {
         this.goldbrokerRestClient = goldbrokerRestClient;
     }
 
+    @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchSpotPriceFallback")
     public GoldbrokerSpotPriceResponse fetchSpotPrice(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
         String apiUnit = isTola ? "g" : weightUnit;
@@ -49,6 +51,7 @@ public class MetalPriceHelper {
         }
     }
 
+    @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchHistoricalPricesFallback")
     public GoldbrokerHistoricalResponse fetchHistoricalPrices(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
         String apiUnit = isTola ? "g" : weightUnit;
@@ -69,6 +72,7 @@ public class MetalPriceHelper {
         }
     }
 
+    @CircuitBreaker(name = "goldbrokerApi", fallbackMethod = "fetchFullHistoryFallback")
     public GoldbrokerHistoricalResponse fetchFullHistory(String metal, String currency, String weightUnit) {
         boolean isTola = TOLA.equalsIgnoreCase(weightUnit);
         String apiUnit = isTola ? "g" : weightUnit;
@@ -87,6 +91,26 @@ public class MetalPriceHelper {
             log.error("Failed to fetch full history for metal={} currency={}", metal, currency, ex);
             throw new ExternalApiException("Unable to retrieve full price history from Goldbroker", ex);
         }
+    }
+
+    // --- Circuit breaker fallbacks ---
+
+    private GoldbrokerSpotPriceResponse fetchSpotPriceFallback(
+            String metal, String currency, String weightUnit, Throwable ex) {
+        log.warn("Circuit breaker OPEN — spot price unavailable: metal={} currency={}: {}", metal, currency, ex.getMessage());
+        throw new ExternalApiException("Metal price service is temporarily unavailable. Please try again shortly.", ex);
+    }
+
+    private GoldbrokerHistoricalResponse fetchHistoricalPricesFallback(
+            String metal, String currency, String weightUnit, Throwable ex) {
+        log.warn("Circuit breaker OPEN — historical prices unavailable: metal={} currency={}: {}", metal, currency, ex.getMessage());
+        throw new ExternalApiException("Historical price data is temporarily unavailable. Please try again shortly.", ex);
+    }
+
+    private GoldbrokerHistoricalResponse fetchFullHistoryFallback(
+            String metal, String currency, String weightUnit, Throwable ex) {
+        log.warn("Circuit breaker OPEN — full history unavailable: metal={} currency={}: {}", metal, currency, ex.getMessage());
+        throw new ExternalApiException("Full price history is temporarily unavailable. Please try again shortly.", ex);
     }
 
     private GoldbrokerSpotPriceResponse tolaSpot(GoldbrokerSpotPriceResponse r) {

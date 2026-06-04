@@ -8,6 +8,7 @@ import com.smarthmalik.metalpulse.core.constant.URLConstants;
 import com.smarthmalik.metalpulse.core.facade.AuthFacade;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,5 +32,12 @@ public class AuthController {
     @PostMapping(URLConstants.AUTH_LOGIN)
     public ApiResponse<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         return authFacade.login(request);
+    }
+
+    @Operation(summary = "Log out and invalidate the current JWT token")
+    @PostMapping(URLConstants.AUTH_LOGOUT)
+    public ApiResponse<Void> logout(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").substring(7);
+        return authFacade.logout(token);
     }
 }
