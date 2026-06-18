@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { NavLink, useNavigate, Outlet } from 'react-router-dom';
 import {
   LayoutDashboard, TrendingUp, ArrowLeftRight, Briefcase,
-  BarChart2, LogOut, Zap, Menu, X, ChevronRight,
+  BarChart2, LogOut, Zap, Menu, X, ChevronRight, Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
@@ -13,6 +13,7 @@ const NAV = [
   { to: '/trade',     label: 'Trade',      icon: ArrowLeftRight },
   { to: '/portfolio', label: 'Portfolio',  icon: Briefcase },
   { to: '/analytics', label: 'Analytics',  icon: BarChart2 },
+  { to: '/assistant', label: 'Assistant',  icon: Sparkles },
 ];
 
 export default function Layout() {

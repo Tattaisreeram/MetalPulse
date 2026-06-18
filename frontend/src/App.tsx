@@ -9,6 +9,7 @@ import Markets from './pages/Markets';
 import Trade from './pages/Trade';
 import Portfolio from './pages/Portfolio';
 import Analytics from './pages/Analytics';
+import Assistant from './pages/Assistant';
 import NotFound from './pages/NotFound';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -37,7 +38,8 @@ export default function App() {
           <Route path="markets"   element={<Markets />} />
           <Route path="trade"     element={<Trade />} />
           <Route path="portfolio" element={<Portfolio />} />
-          <Route path="analytics" element={<Analytics />} />
+          <Route path="analytics"  element={<Analytics />} />
+          <Route path="assistant" element={<Assistant />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
