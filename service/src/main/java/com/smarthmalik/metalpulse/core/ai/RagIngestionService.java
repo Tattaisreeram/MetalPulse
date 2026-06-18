@@ -6,6 +6,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.reader.TextReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
@@ -15,11 +16,10 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-// Ingests the unstructured metals knowledge corpus into the in-memory VectorStore at
-// startup. Structured per-user data is never ingested here — see PortfolioTools.
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@ConditionalOnBean(VectorStore.class)
 public class RagIngestionService {
 
     private static final String KNOWLEDGE_BASE_LOCATION = "classpath:/knowledge/*";

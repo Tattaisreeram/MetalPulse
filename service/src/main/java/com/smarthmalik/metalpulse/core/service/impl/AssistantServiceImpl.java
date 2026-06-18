@@ -10,6 +10,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class AssistantServiceImpl implements AssistantService {
@@ -30,12 +31,13 @@ public class AssistantServiceImpl implements AssistantService {
 
     public AssistantServiceImpl(
             ChatClient.Builder chatClientBuilder,
-            VectorStore vectorStore,
+            Optional<VectorStore> vectorStore,
             PortfolioTools portfolioTools) {
-        this.chatClient = chatClientBuilder
-                .defaultSystem(SYSTEM_PROMPT)
-                .defaultAdvisors(QuestionAnswerAdvisor.builder(vectorStore).build())
-                .build();
+
+        ChatClient.Builder builder = chatClientBuilder.defaultSystem(SYSTEM_PROMPT);
+        vectorStore.ifPresent(vs ->
+                builder.defaultAdvisors(QuestionAnswerAdvisor.builder(vs).build()));
+        this.chatClient = builder.build();
         this.portfolioTools = portfolioTools;
     }
 
