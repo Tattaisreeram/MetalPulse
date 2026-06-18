@@ -24,11 +24,13 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven { url 'https://repo.spring.io/milestone' }
     }
 
     dependencyManagement {
         imports {
             mavenBom "org.springframework.boot:spring-boot-dependencies:4.0.1"
+            mavenBom "org.springframework.ai:spring-ai-bom:2.0.0-M4"
         }
     }
 

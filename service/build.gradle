@@ -18,8 +18,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 
     // Circuit breaker + retry (Resilience4j)
-    implementation 'io.github.resilience4j:resilience4j-spring-boot3'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    // resilience4j-spring-boot3 is no longer BOM-managed in Spring Boot 4; pin explicitly.
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+    // spring-boot-starter-aop was removed in Spring Boot 4; AspectJ weaver is its only real dep.
+    implementation 'org.aspectj:aspectjweaver'
 
     // Observability
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -38,6 +40,14 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
     runtimeOnly  'io.jsonwebtoken:jjwt-impl:0.12.6'
     runtimeOnly  'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // Spring AI — RAG + tool calling (Google Gemini Developer API; one key covers chat and embeddings)
+    implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
+    implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
+
+    // OpenTelemetry — distributed traces + OTLP export
+    implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+    implementation 'io.opentelemetry:opentelemetry-exporter-otlp'
 
     // Swagger / OpenAPI
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
