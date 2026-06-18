@@ -33,6 +33,10 @@ public final class URLConstants {
     public static final String ANALYTICS_PRICE_CHANGE = ANALYTICS_BASE + "/price-change";
     public static final String ANALYTICS_RETURNS      = ANALYTICS_BASE + "/returns";
 
+    // AI Assistant
+    public static final String ASSISTANT_BASE = API_V1 + "/assistant";
+    public static final String ASSISTANT_ASK  = ASSISTANT_BASE + "/ask";
+
     // Public endpoints (no auth required)
     public static final String[] PUBLIC_ENDPOINTS = {
             AUTH_REGISTER, AUTH_LOGIN,
