@@ -1,6 +1,6 @@
 # MetalPulse
 
-A **production-grade precious metals trading platform** built with Spring Boot 4, React 19, and a modern event-driven backend stack. Users can register, fund their account, trade gold/silver/platinum/palladium at live market prices, and track portfolio performance with real-time analytics.
+A **production-grade precious metals trading platform** built with Spring Boot 4, React 19, and a modern event-driven backend stack. Users can register, fund their account, trade gold/silver/platinum/palladium at live market prices, track portfolio performance with real-time analytics, and chat with an AI assistant powered by Google Gemini.
 
 ---
 
@@ -18,6 +18,11 @@ React (Vite)  ──────►  REST API (Spring Boot)  ──────�
                               │
                               ├──►  Goldbroker API     (live spot prices)
                               │         └── Resilience4j: @Retry(3x) + @CircuitBreaker
+                              │
+                              ├──►  Gemini API (Spring AI)  (AI assistant)
+                              │         ├── ChatClient + RAG (QuestionAnswerAdvisor)
+                              │         ├── SimpleVectorStore   (in-memory embeddings)
+                              │         └── Resilience4j: @CircuitBreaker
                               │
                               └──►  gRPC (port 9090)  (auth + trade internal services)
 ```
@@ -37,6 +42,7 @@ Every `BUY / SELL / HOLD` trade is committed to MySQL first, then a `TradeExecut
 | Persistence | Spring Data JPA · MySQL 8 · Flyway migrations |
 | Caching | Redis 7 · Spring Cache (`@Cacheable`) |
 | Messaging | Apache Kafka 3 (KRaft, no Zookeeper) · Spring Kafka |
+| AI | Spring AI · Google Gemini 2.0 Flash (chat) · text-embedding-004 (embeddings) |
 | Resilience | Resilience4j — `@Retry` (exponential backoff) + `@CircuitBreaker` |
 | Observability | Spring Boot Actuator · Micrometer · Prometheus |
 | Docs | Springdoc OpenAPI / Swagger UI |
@@ -59,6 +65,7 @@ Every `BUY / SELL / HOLD` trade is committed to MySQL first, then a `TradeExecut
 - **Docker + Docker Compose** — for the recommended one-command setup
 - **Java 21** — for running the backend locally without Docker
 - **Node.js 18+** — for the frontend
+- **Google Gemini API key** — for the AI assistant (`GEMINI_API_KEY`)
 
 ---
 
@@ -74,7 +81,7 @@ cd MetalPulse
 cp .env.example .env
 ```
 
-Edit `.env` and set a strong JWT secret (minimum 32 characters):
+Edit `.env` and set a strong JWT secret (minimum 32 characters) and your Gemini API key:
 
 ```env
 DATABASE_URL=jdbc:mysql://127.0.0.1:3306/metalpulse_db?...
@@ -85,6 +92,7 @@ JWT_EXPIRATION_MS=86400000
 REDIS_HOST=localhost
 REDIS_PORT=6379
 KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+GEMINI_API_KEY=your-google-gemini-api-key
 ```
 
 ### 2. Build the JAR
@@ -131,7 +139,6 @@ redis-server
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS metalpulse_db;"
 
 # Kafka (optional — app starts without it, trades still persist to DB)
-# Download Kafka 3.x and run with KRaft mode, or use Docker just for Kafka:
 docker compose up kafka -d
 ```
 
@@ -139,7 +146,7 @@ docker compose up kafka -d
 
 ```bash
 cp .env.example .env
-# Edit .env with your local MySQL credentials and JWT secret
+# Edit .env with your local MySQL credentials, JWT secret, and Gemini API key
 ```
 
 ### 3. Start the backend
@@ -207,8 +214,37 @@ Interactive documentation is at `http://localhost:8080/swagger-ui.html`. Key end
 | `GET` | `/api/v1/trades/history` | Paginated trade history |
 | `GET` | `/api/v1/analytics/price-change` | Price change analytics |
 | `GET` | `/api/v1/analytics/returns` | Portfolio return calculations |
+| `POST` | `/api/v1/assistant/ask` | Ask the AI assistant about your portfolio or precious metals |
 
-All endpoints except register and login require a `Authorization: Bearer <token>` header.
+All endpoints except register and login require an `Authorization: Bearer <token>` header.
+
+---
+
+## AI Assistant
+
+The AI assistant is a context-aware chat interface powered by **Google Gemini 2.0 Flash** via Spring AI. It answers questions about the platform, precious metals, and the authenticated user's own account data.
+
+### How it works
+
+1. **RAG (Retrieval-Augmented Generation)** — on startup, `RagIngestionService` reads every markdown file from `service/src/main/resources/knowledge/`, splits them into chunks with `TokenTextSplitter`, embeds them using `text-embedding-004`, and stores the vectors in an in-memory `SimpleVectorStore`. The `QuestionAnswerAdvisor` retrieves relevant chunks for each question and injects them into the prompt context.
+
+2. **Function Calling (Tools)** — `PortfolioTools` exposes two Spring AI `@Tool` methods the model can invoke to fetch live, per-user data:
+   - `currentBalance` — returns the user's current paper-trading balance
+   - `recentTrades` — returns the 10 most recent trades
+
+   Both tools read the authenticated user from `ToolContext`, never from a model-supplied ID, so they can only act on the caller's own data.
+
+3. **Circuit Breaker** — `AssistantFacade` wraps every request with `@CircuitBreaker`. If the Gemini API becomes unavailable the circuit opens and a graceful fallback message is returned so trading is never blocked by assistant downtime.
+
+### Usage
+
+```
+POST /api/v1/assistant/ask
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{ "question": "What is my current balance?" }
+```
 
 ---
 
@@ -219,16 +255,20 @@ All endpoints except register and login require a `Authorization: Bearer <token>
 | `/actuator/health` | App health including DB, Redis, and circuit breaker state |
 | `/actuator/metrics` | JVM, HTTP request, and cache metrics |
 | `/actuator/prometheus` | Prometheus-format scrape endpoint (plug into Grafana) |
-| `/actuator/circuitbreakers` | Live circuit breaker state for the Goldbroker API |
+| `/actuator/circuitbreakers` | Live circuit breaker state for Goldbroker API and AI assistant |
 
 ---
 
 ## Resilience
 
-The Goldbroker spot price API is protected by a two-layer resilience strategy:
+Two external dependencies are protected by Resilience4j circuit breakers:
 
+**Goldbroker spot price API**
 1. **`@Retry`** — retries up to 3 times with exponential backoff (`500ms → 1s → 2s`) before propagating the failure
 2. **`@CircuitBreaker`** — opens after 50% failure rate over 10 calls; stays open for 30 seconds; half-opens with 3 probe calls
+
+**Gemini AI API**
+- **`@CircuitBreaker`** — same thresholds as above; falls back to a friendly "temporarily unavailable" message so the assistant never blocks trading
 
 Circuit state is visible at `/actuator/health` and `/actuator/circuitbreakers`.
 
@@ -259,11 +299,12 @@ MetalPulse/
 │   └── src/
 │       ├── main/java/
 │       │   └── com/smarthmalik/metalpulse/
-│       │       ├── configuration/   AppConfig, SecurityConfig, CacheConfig, KafkaConfig
+│       │       ├── configuration/   AppConfig, SecurityConfig, CacheConfig, KafkaConfig, AiConfig
 │       │       └── core/
-│       │           ├── controller/  REST endpoints
-│       │           ├── facade/      orchestration layer
-│       │           ├── service/     business logic
+│       │           ├── ai/          PortfolioTools (function calling), RagIngestionService
+│       │           ├── controller/  REST endpoints (Auth, Trade, MetalPrice, Analytics, Assistant)
+│       │           ├── facade/      orchestration layer (includes AssistantFacade + circuit breaker)
+│       │           ├── service/     business logic + AssistantService (Spring AI ChatClient + RAG)
 │       │           ├── kafka/       TradeEventRelay + consumers
 │       │           ├── helper/      MetalPriceHelper (Goldbroker), FxRateHelper
 │       │           ├── security/    JWT filter, token blacklist
@@ -272,10 +313,11 @@ MetalPulse/
 │       │           └── grpc/        AuthGrpcService, TradeGrpcService
 │       ├── main/resources/
 │       │   ├── application.properties
+│       │   ├── knowledge/           RAG knowledge base (markdown files ingested at startup)
 │       │   └── db/migration/        Flyway SQL migrations
 │       └── test/java/               Testcontainers integration tests
 ├── proto/                # Protobuf definitions for gRPC
-├── frontend/             # React + Vite + TypeScript
+├── frontend/             # React + Vite + TypeScript (includes AI assistant chat page)
 ├── docker-compose.yml    # MySQL + Redis + Kafka + app
 └── .env.example          # Environment variable template
 ```
@@ -294,3 +336,4 @@ MetalPulse/
 | `REDIS_HOST` | No | Redis host (default: `localhost`) |
 | `REDIS_PORT` | No | Redis port (default: `6379`) |
 | `KAFKA_BOOTSTRAP_SERVERS` | No | Kafka broker address (default: `localhost:9092`) |
+| `GEMINI_API_KEY` | Yes | Google Gemini API key for the AI assistant |

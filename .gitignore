@@ -42,3 +42,8 @@ build/
 .env
 dist/
 out/
+
+### Runtime artifacts ###
+*.log
+*.log.err
+META-INF/
