@@ -79,3 +79,8 @@ dependencies {
     testImplementation 'org.testcontainers:mysql'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
 }
+
+test {
+    useJUnitPlatform()
+    include '**/*Test.class', '**/*Tests.class', '**/Test*.class', '**/*IT.class'
+}

@@ -27,8 +27,9 @@ public class TradeEventRelay {
                         log.error("Failed to publish TradeExecutedEvent tradeId={}: {}",
                                 event.tradeId(), ex.getMessage());
                     } else {
-                        log.debug("TradeExecutedEvent published: tradeId={} type={} partition={}",
-                                event.tradeId(), event.tradeType(),
+                        log.info("[KAFKA] Published tradeId={} userId={} type={} metal={} qty={} → partition={}",
+                                event.tradeId(), event.userId(), event.tradeType(),
+                                event.metal(), event.quantity(),
                                 result.getRecordMetadata().partition());
                     }
                 });
